@@ -25,6 +25,8 @@ Make sure you have [Anaconda](https://www.anaconda.com/products/distribution) in
 5. Install the required packages:
 ``` pip install -r requirements.txt ```
 
+6. Create a *.env* file in NLI_with_csv directory, then add a variable for the *OpenAI-API-Key* 
+
 ### Usage
 1. Run the Streamlit app:
 ``` streamlit run src/main.py ```
