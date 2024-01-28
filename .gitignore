@@ -1,2 +1,6 @@
-notebooks/*
 src/.env
+data/*
+cache/*
+uploads/*
+pandasai.log
+.env

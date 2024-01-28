@@ -1,22 +1,15 @@
 from utils.imports import *
 
-
-load_dotenv()
+load_dotenv(".env")
 os.environ["OPENAI_API_KEY"] = os.getenv('OpenAI-API-Key')
 
-
-def get_response_llm(file, question):
-    agent = create_csv_agent(
-    OpenAI(temperature=0),
-    file,
-    verbose=True,
-    agent_type=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
-)
-    return agent.run(question)
-
-# Create a placeholder for chat messages
 # Create a placeholder for chat messages
 chat_messages = []
+
+def get_response_llm(file, question):
+    llm = OpenAI()
+    df = SmartDataframe(file, config={"llm": llm})
+    return df.chat(question)
 
 def main():
     st.title("Talk with your CSV")
@@ -35,12 +28,6 @@ def main():
         # Show messages in the chat
         show_chat()
 
-        # Generate a unique filename with a timestamp
-        timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
-        unique_filename = f"uploaded_file_{timestamp}.csv"
-        save_path = os.path.join("uploads",unique_filename)
-        df.to_csv(save_path, index=False)
-
         # Transition to chat mode
         st.header("Chat Mode")
 
@@ -51,10 +38,22 @@ def main():
     if user_input:
         chat_messages.append(f"**You:** {user_input}")
         # Add your logic here to generate a chatbot response or any other interactions
-        chat_messages.append(f"**Analyst:** {get_response_llm(save_path,user_input)}")
+        chat_messages.append(f"**Analyst:** {get_response_llm(df, user_input)}")
 
     # Show messages in the chat
     show_chat()
+
+def remove_exports_chart():
+    # Specify the path to the folder you want to remove
+    folder_to_remove = "exports"
+
+    try:
+        # Attempt to remove the folder and its contents
+        shutil.rmtree(folder_to_remove)
+        print(f"The folder '{folder_to_remove}' has been successfully removed.")
+    except Exception as e:
+        print(f"An error occurred while removing the folder: {e}")
+
 
 def show_chat():
     # Display chat messages with chat-like styling
@@ -63,6 +62,8 @@ def show_chat():
             st.markdown(f'<div style="text-align: right; color: #4184f3; padding: 5px;">{message}</div>', unsafe_allow_html=True)
         else:
             st.markdown(f'<div style="text-align: left; color: #4a4a4a; padding: 5px;">{message}</div>', unsafe_allow_html=True)
+    
+    remove_exports_chart()
 
 
 if __name__ == "__main__":
